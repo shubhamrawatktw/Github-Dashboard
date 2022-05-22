@@ -9,47 +9,72 @@ const rootUrl = "https://api.github.com";
 const GithubContext = React.createContext();
 
 const GithubProvider = ({ children }) => {
+  const [githubUser, setGithubUser] = useState(mockUser);
+  const [repos, setRepos] = useState(mockRepos);
+  const [followers, setFollowers] = useState(mockFollowers);
+  // request
+  const [requests, setRequests] = useState(0);
+  const [isLoading, setIsloading] = useState(false);
 
-const[githubUser,setGithubUser] = useState(mockUser)
-const[repos,setRepos] = useState(mockRepos)
-const[followers,setFollowers] = useState(mockFollowers)
-// request
-const [requests,setRequests] = useState(0)
-const [loading,setIsloading] = useState(false)
+  // errors
+  const [error, setError] = useState({ show: false, msg: "" });
+  // search users
+  const searchGithubUser = async (user) => {
+    toggleError();
+    setIsloading(true)
+    const response = await axios(`${rootUrl}/users/${user}`).catch((err) =>
+      console.log(err)
+    );
 
-// errors
-const [error,setError] = useState({show:false,msg:""})
-// check rate
-const checkRequests = ()=>{
+    if (response) {
+        setGithubUser(response.data)
+    }
+    else{
+        toggleError(true,"there is no user with that username")
+    }
+    checkRequests()
+    setIsloading(false)
+
+  };
+  // check rate
+  const checkRequests = () => {
     axios(`${rootUrl}/rate_limit`)
-    .then(({data})=>{
-        let {rate:{remaining}}  =data
-        setRequests(remaining)
+      .then(({ data }) => {
+        let {
+          rate: { remaining },
+        } = data;
+        setRequests(remaining);
         if (remaining === 0) {
-           toggleError(true,"sorry, you have exceeded your hourly rate limit !")
+          toggleError(
+            true,
+            "sorry, you have exceeded your hourly rate limit !"
+          );
         }
-    })
-    .catch((err)=>console.log(err))
-}
+      })
+      .catch((err) => console.log(err));
+  };
 
-function toggleError(show = false,msg ="") {
-    setError({show,msg})
-}
+  function toggleError(show = false, msg = "") {
+    setError({ show, msg });
+  }
 
-useEffect(checkRequests,[])
+  useEffect(checkRequests, []);
 
- return  <GithubContext.Provider 
- value={{
-     githubUser,
-     repos,
-     followers,
-     requests,
-     error,
- }}>
- {children}
- </GithubContext.Provider>;
+  return (
+    <GithubContext.Provider
+      value={{
+        githubUser,
+        repos,
+        followers,
+        requests,
+        error,
+        searchGithubUser,
+        isLoading
+      }}
+    >
+      {children}
+    </GithubContext.Provider>
+  );
 };
 
-export {GithubContext,GithubProvider}
-
-
+export { GithubContext, GithubProvider };
