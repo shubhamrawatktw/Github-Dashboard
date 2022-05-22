@@ -1,7 +1,33 @@
-import React from 'react';
+import React, { Component } from 'react';
 
-const Pie3D = () => {
-  return <div>chart</div>;
-};
+import FusionCharts from 'fusioncharts';
+import Charts from 'fusioncharts/fusioncharts.charts';
+import ReactFC from 'react-fusioncharts';
+import FusionTheme from 'fusioncharts/themes/fusioncharts.theme.fusion';
 
-export default Pie3D;
+ReactFC.fcRoot(FusionCharts, Charts, FusionTheme);
+
+const ChartComponent = ({data})=>{
+  const chartData = {
+    "chart": {
+      "caption": "Languages",
+      "theme": "fusion",
+      decimals:0,
+      pieRadius:'40%',
+   
+    },
+    "data": data
+  }
+  
+  const chartConfigs = {
+    type: "pie3d",
+    width: 500,
+    height: 400,
+    dataFormat: 'json',
+    dataSource: chartData,
+  };
+  return <ReactFC {...chartConfigs} />;
+}
+
+export default ChartComponent
+
