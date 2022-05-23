@@ -12,7 +12,7 @@ const {requests , error,searchGithubUser,isLoading} = useContext(GithubContext)
    
 searchGithubUser(user)
 
-  // setUser("")
+  setUser("")
  }
 
   }
